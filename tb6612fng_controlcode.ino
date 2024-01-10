@@ -22,8 +22,8 @@
   
 */  
    // pwm 5,6 have lower freq so dont use them for pwm
-int lpins = {A0, A1};
-int rpins = {A2, A3};
+int lpins[] = {A0, A1};
+int rpins[] = {A2, A3};
 int ir1 = 12;
 int ir2 = 9;
 int ir3 = 8;
@@ -46,12 +46,6 @@ void setup() {
    pinMode(3,OUTPUT);
 }
 // stop
-
-void sensorsRead(int sensor_data[]=an_ir, int const pins[]=pins, int n = 8){
-  for(int i=0; i<n; i++){
-    sensor_data[i] = analogRead(pins[i]);
-  }
-}
 // qtr library
 
 void motorStop(int *pins, int pwm) {
