@@ -114,5 +114,4 @@ void loop() {
   delay(5000);
   motorStop(l1,l2,lp);
   */
-  // cant stop addicted to the shindig
 }
