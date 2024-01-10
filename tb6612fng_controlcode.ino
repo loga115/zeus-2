@@ -44,6 +44,8 @@ void setup() {
    pinMode(9, OUTPUT);
    pinMode(10, OUTPUT);
    pinMode(3,OUTPUT);
+   pinMode(A0,OUTPUT);
+   pinMode(A1,OUTPUT)
 }
 // stop
 // qtr library
