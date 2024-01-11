@@ -14,16 +14,19 @@
 /* PINS
  *  pwm pins: 3,5,6,9,10,11
       pwm input pins: 10,11
-      direction pins : a0-a3
-      standby pins: A4
+      direction pins : 
+      Left: A0, A1
+      Right: A3, A4
+      standby pins: A2
       sensor pins:
       from left to right, d12, d9, d8, d7, d6, d5, d4, d3, d2
       sensor emitter pin: d2  
   
 */  
+
    // pwm 5,6 have lower freq so dont use them for pwm
 int lpins[] = {A0, A1};
-int rpins[] = {A2, A3};
+int rpins[] = {A3, A4};
 int ir1 = 12;
 int ir2 = 9;
 int ir3 = 8;
@@ -33,7 +36,7 @@ int ir6 = 5;
 int ir7 = 4;
 int ir8 = 3;
 int emitter=2;
-int stby = A4;
+int stby = A2;
 int kp = 0, ki = 0, kd = 0;
 int pins[8] = {ir1, ir2, ir3, ir4, ir5, ir6, ir7, ir8};
 int an_ir[8];
