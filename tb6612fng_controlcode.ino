@@ -27,6 +27,7 @@
    // pwm 5,6 have lower freq so dont use them for pwm
 int lpins[] = {A0, A1};
 int rpins[] = {A3, A4};
+int lp = 10, rp = 11;
 int ir1 = 12;
 int ir2 = 9;
 int ir3 = 8;
