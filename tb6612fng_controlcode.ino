@@ -23,25 +23,34 @@
       sensor emitter pin: d2  
   
 */  
+#include <QTRSensors.h>
+QTRSensors qtr;
 
    // pwm 5,6 have lower freq so dont use them for pwm
 int lpins[] = {A0, A1};
 int rpins[] = {A3, A4};
 int lp = 10, rp = 11;
-int ir1 = 12;
-int ir2 = 9;
-int ir3 = 8;
-int ir4 = 7;
-int ir5 = 6;
-int ir6 = 5;
-int ir7 = 4;
-int ir8 = 3;
+uint8_t ir1 = 12;
+uint8_t ir2 = 9;
+uint8_t ir3 = 8;
+uint8_t ir4 = 7;
+uint8_t ir5 = 6;
+uint8_t ir6 = 5;
+uint8_t ir7 = 4;
+uint8_t ir8 = 3;
 int emitter=2;
 int stby = A2;
 int kp = 0, ki = 0, kd = 0;
-int pins[8] = {ir1, ir2, ir3, ir4, ir5, ir6, ir7, ir8};
+uint8_t pins[8] = {ir1, ir2, ir3, ir4, ir5, ir6, ir7, ir8};
 int an_ir[8];
 int dig_ir[8];
+int pushbutton_pin = A5;
+int lpwm = 0;
+int rpwm = 0;
+
+
+
+
 
 void setup() {
   
@@ -49,29 +58,46 @@ void setup() {
    pinMode(10, OUTPUT);
    pinMode(3,OUTPUT);
    pinMode(A0,OUTPUT);
-   pinMode(A1,OUTPUT)
+   pinMode(A1,OUTPUT);
+   qtr.setTypeRC();
+   qtr.setSensorPins(pins, 8);
 }
 // stop
 // qtr library
 
-void motorStop(int *pins, int pwm) {
+void motorStop(int *pins, int pwm_pin, int pwm_value) {
   digitalWrite(pins[0], LOW);
   digitalWrite(pins[1], LOW);
-  analogWrite(pwm, 230);
+  analogWrite(pwm_pin, pwm_value);
 }
 
-void motorForward(int *pins, int pwm) {
+void motorForward(int *pins, int pwm_pin, int pwm_value) {
   digitalWrite(pins[0], HIGH);
   digitalWrite(pins[1], LOW);
-  analogWrite(pwm, 230);
+  analogWrite(pwm_pin, pwm_value);
 }
 
-void motorReverse(int in1, int in2, int pwm) {
+void motorReverse(int *pins, int pwm_pin, int pwm_value) {
   digitalWrite(pins[0], LOW); 
   digitalWrite(pins[1], HIGH);
-  digitalWrite(pwm, 230);
+  digitalWrite(pwm_pin, pwm_value);
 }
 
+void calib() {
+  motorForward(lpins,lp, HIGH);
+  motorReverse(rpins,rp, HIGH); // spin
+  for (int i=0; i<100; i++) {
+    qtr.calibrate();
+    delay(40);
+  }
+  motorStop(lpins, lp, 10);
+  motorStop(rpins, rp, 10);
+}
+
+void writeMotors(int pwm) {
+  motorForward(lpins,lp, pwm);
+  motorForward(rpins, rp, pwm);
+}
 
 float getPID(float error)
 {
@@ -80,10 +106,10 @@ float getPID(float error)
   //Error is the difference between the postion of the bot and the position we want it to be
   unsigned long current_time=millis();
   double del_time=current_time-prev_time;                   //Steady state error
-  reset += (error-prev_error)*del_time;                                 //Reset-The small errors that get accumulated over time *reset gets added over time , hence global variable
+  reset += (error-prev_error)*del_time;                     //Reset-The small errors that get accumulated over time *reset gets added over time , hence global variable
   float rate_error= (error-prev_error)/del_time;    
   //float rate_error = error-prev_error;//Rate of change of error
-  float pid=kp*(error) + ki*(reset) + kd*(rate_error);     //Calculate PID value
+  float pid=kp*(error) + ki*(reset) + kd*(rate_error);      //Calculate PID value
   
   if(pid!=0){
   //Serial.print(error);
@@ -99,9 +125,18 @@ float getPID(float error)
   return pid;
 }
 
+
+
 void loop() {
   digitalWrite(stby, HIGH);
   // put your main code here, to run repeatedly:
+  int pushbutton_status = digitalRead(pushbutton_pin);
+  if (pushbutton_status = 1) {
+    calib();
+  }
+  
+  
+  /*
   delay(200);
   motorForward(r1,r2,lp);
   delay(3000);
@@ -110,7 +145,7 @@ void loop() {
   motorReverse(r1,r2,rp);
   delay(3000);
   motorStop(r1,r2,rp);
-  /*
+
   delay(200);
   motorForward(l1, l2, lp);
   delay(5000);
