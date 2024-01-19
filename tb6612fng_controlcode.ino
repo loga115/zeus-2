@@ -30,24 +30,17 @@ QTRSensors qtr;
 int lpins[] = {A0, A1};
 int rpins[] = {A3, A4};
 int lp = 10, rp = 11;
-uint8_t ir1 = 12;
-uint8_t ir2 = 9;
-uint8_t ir3 = 8;
-uint8_t ir4 = 7;
-uint8_t ir5 = 6;
-uint8_t ir6 = 5;
-uint8_t ir7 = 4;
-uint8_t ir8 = 3;
+uint8_t ir1 = 12, ir2 = 9, ir3 = 8, ir4 = 7, ir5 = 6, ir6 = 5, ir7 = 4, ir8 = 3;
 int emitter=2;
 int stby = A2;
 int kp = 0, ki = 0, kd = 0;
 uint8_t pins[8] = {ir1, ir2, ir3, ir4, ir5, ir6, ir7, ir8};
 int an_ir[8];
-int dig_ir[8];
+int dig_ir[8];  
 int pushbutton_pin = A5;
 int lpwm = 0;
 int rpwm = 0;
-
+uint16_t sensorData[8]; // qtr sensors documentation says readCalibrated returns data in uint16_t
 
 
 
@@ -61,6 +54,7 @@ void setup() {
    pinMode(A1,OUTPUT);
    qtr.setTypeRC();
    qtr.setSensorPins(pins, 8);
+   qtr.setEmitterPin((uint8_t) emitter);
 }
 // stop
 // qtr library
@@ -134,25 +128,10 @@ void loop() {
   if (pushbutton_status = 1) {
     calib();
   }
+  qtr.readCalibrated(sensorData);
+  uint16_t pos = qtr.readLineBlack(sensorData);
+  float pid = getPID((float) pos - 4000);
+  lpwm = (lpwm+pid > 240 ) ? 240 : lpwm+pid;  // keep the motors running at a speed lower than full HIGH
+  rpwm = (rpwm-pid < 10 ) ? 10 : rpwm-pid;
   
-  
-  /*
-  delay(200);
-  motorForward(r1,r2,lp);
-  delay(3000);
-  motorStop(r1,r2,rp);
-  delay(200);
-  motorReverse(r1,r2,rp);
-  delay(3000);
-  motorStop(r1,r2,rp);
-
-  delay(200);
-  motorForward(l1, l2, lp);
-  delay(5000);
-  motorStop(l1,l2,lp);
-  delay(200);
-  motorReverse(l1,l2,lp);
-  delay(5000);
-  motorStop(l1,l2,lp);
-  */
 }
