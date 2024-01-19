@@ -29,7 +29,7 @@ QTRSensors qtr;
    // pwm 5,6 have lower freq so dont use them for pwm
 int lpins[] = {A0, A1};
 int rpins[] = {A3, A4};
-int lp = 10, rp = 11;
+int lp = 11, rp = 10;
 uint8_t ir1 = 12, ir2 = 9, ir3 = 8, ir4 = 7, ir5 = 6, ir6 = 5, ir7 = 4, ir8 = 3;
 int emitter=2;
 int stby = A2;
@@ -50,8 +50,8 @@ void calib() {
     qtr.calibrate();
     delay(40);
   }
-  motorStop(lpins, lp, 10);
-  motorStop(rpins, rp, 10);
+  motorStop(lpins, lp);
+  motorStop(rpins, rp);
 }
 
 
@@ -66,7 +66,6 @@ void setup() {
    qtr.setTypeRC();
    qtr.setSensorPins(pins, 8);
    qtr.setEmitterPin((uint8_t) emitter);
-   calib();
 }
 // stop
 // qtr library
@@ -126,21 +125,16 @@ float getPID(float error)
 void loop() {
   digitalWrite(stby, HIGH);
   // put your main code here, to run repeatedly:
-  motorForward(lpins, lp, HIGH);
-  delay(500);
+  motorForward(lpins, lp, 240);
+  motorForward(rpins, rp, 240);
+  delay(5000);
   motorStop(lpins, lp);
-  delay(500);
-  motorReverse(lpins, lp, HIGH);
-  delay(500);
-  motorStop(lpins, lp);
-  delay(500);
-  motorForward(rpins, rp, HIGH);
-  delay(500);
   motorStop(rpins, rp);
   delay(500);
-  motorReverse(rpins, rp, HIGH);
-  delay(500);
+  motorReverse(lpins, lp, 240);
+  motorReverse(rpins, rp, 240);
+  delay(5000);
+  motorStop(lpins, lp);
   motorStop(rpins, rp);
   delay(500);
-  
 }
